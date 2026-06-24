@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar Meteociel</title>
+<style>
+  html,body{margin:0;padding:0;background:#000;overflow:hidden;}
+  /* fenetre visible = taille native du canvas (768x768) */
+  #vp{position:relative;overflow:hidden;background:#000;}
+  #rf{position:absolute;top:0;left:0;border:0;}
+</style>
+</head>
+<body>
+<div id="vp"><iframe id="rf" scrolling="no"></iframe></div>
+<script>
+/* ===========================================================
+   REGLAGES
+   -----------------------------------------------------------
+   CANVAS_LEFT / CANVAS_TOP : coin haut-gauche du radar dans la
+        page meteociel rendue a FRAME_W de large (a ajuster si
+        le cadrage derive a cause des pubs).
+   CANVAS_SIZE : taille native du radar (carre) = 768.
+   SCALE       : 1 = taille native conservee. <1 reduit, >1 agrandit.
+   FRAME_W/FRAME_H : taille forcee de rendu de la page meteociel
+        (large = layout "bureau", position stable).
+   RELOAD_MIN  : rechargement auto, cale sur les 5 min de la source.
+   =========================================================== */
+  const URL_RADAR = "https://www.meteociel.fr/observations-meteo/radarzoom.php?x=8451.15&y=7432.62&ech=8&zoom=4";
+  const CANVAS_LEFT = 660;
+  const CANVAS_TOP  = 345;
+  const CANVAS_SIZE = 768;
+  const SCALE       = 1;      // 768 px natif conserve
+  const FRAME_W = 1900;
+  const FRAME_H = 1300;
+  const RELOAD_MIN = 5;
+
+  const vp = document.getElementById('vp');
+  const rf = document.getElementById('rf');
+
+  // fenetre visible figee a la taille native du canvas
+  const shown = CANVAS_SIZE * SCALE;
+  vp.style.width  = shown + 'px';
+  vp.style.height = shown + 'px';
+
+  rf.style.width  = FRAME_W + 'px';
+  rf.style.height = FRAME_H + 'px';
+  rf.style.transformOrigin = '0 0';
+  rf.style.transform =
+    'scale(' + SCALE + ') translate(' + (-CANVAS_LEFT) + 'px,' + (-CANVAS_TOP) + 'px)';
+
+  function load(){ rf.src = URL_RADAR + '&_=' + Date.now(); }
+  load();
+  // rechargement periodique pour recuperer la derniere image radar
+  setInterval(load, RELOAD_MIN * 60 * 1000);
+</script>
+</body>
+</html>
